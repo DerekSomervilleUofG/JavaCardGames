@@ -6,8 +6,6 @@ import CardGame.Hand;
 
 public class Deck extends Hand{
 
-    private static HashMap< int[] , Card> cardHashMap;
-
     private Boolean override = false;
 
     public Deck(String deckOverride){

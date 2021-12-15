@@ -98,16 +98,6 @@ public class Hand{
         return handOfCards.size();
     }
 
-    public String toString(){
-        String display = "";
-        String prefix = "";
-        for (Card card : handOfCards){
-            display += prefix + card;
-            prefix = ", ";
-        }
-        return display;
-    }
-
     public void sortHand(){
         Collections.sort(handOfCards, Comparator.comparing(Card::toString));
     }
@@ -120,5 +110,15 @@ public class Hand{
             System.out.println(e.getMessage());
         }
 
+    }
+
+    public String toString(){
+        String display = "";
+        String prefix = "";
+        for (Card card : handOfCards){
+            display += prefix + card;
+            prefix = ", ";
+        }
+        return display;
     }
 }
