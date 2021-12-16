@@ -3,7 +3,6 @@ package GinRummy;
 import CardGame.CardGame;
 import Player.Player;
 import CardGame.Hand;
-import Player.PlayerType;
 import CardGame.Card;
 import CardGame.Suit;
 import CardGame.CardRank;
@@ -58,7 +57,7 @@ public class GinRummy extends CardGame {
             hand.sortHand();
         } catch (Exception e) {
             this.userOutput.output("sortHand failed");
-            this.userOutput.outputHand(hand);
+            this.userOutput.output(hand.toString());
         }
 
         Card firstCard = hand.getFirstCard();
@@ -98,7 +97,7 @@ public class GinRummy extends CardGame {
 
     protected void userPlays(Player player, Deck deck){
         help();
-        String userChoice = userInput.getInputString();
+        String userChoice = userInput.getString();
         Card card;
         if (userChoice.toUpperCase().equals("D")){
             card = deck.playACard();
@@ -109,7 +108,7 @@ public class GinRummy extends CardGame {
         player.getHand().sortHand();
         userOutput.output(player.getHand().toString());
         userOutput.output("Please enter zero to seven to select card to dis guard or enter the card e.g. HA");
-        String userCard = userInput.getInputString();
+        String userCard = userInput.getString();
         discardCards.add(player.getHand().playACard(userCard));
     }
 

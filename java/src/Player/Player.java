@@ -2,7 +2,6 @@ package Player;
 
 import CardGame.Hand;
 
-
 import java.util.Random;
 
 public class Player {
@@ -10,8 +9,7 @@ public class Player {
     private Hand hand;
     private PlayerType playerType;
     private String name;
-    private Boolean winner;
-
+    private Boolean winner = false;
 
     public Player(PlayerType playerType, String name,Integer levelOfRisk){
         this.playerType = playerType;
@@ -24,14 +22,13 @@ public class Player {
             risk = levelOfRisk;
         }
         this.levelOfRisk = risk;
-        this.winner = false;
     }
 
-    public void setWinner(Boolean winner){
-        this.winner = winner;
+    public void setWinner(Boolean status){
+        this.winner = status;
     }
 
-    public Boolean getWinner(){
+    public Boolean hasWon(){
         return winner;
     }
 

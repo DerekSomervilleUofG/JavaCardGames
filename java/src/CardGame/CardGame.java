@@ -1,7 +1,7 @@
 package CardGame;
 import Display.ConsoleOutput;
 import Display.ConsoleInput;
-import Display.Output;
+import Display.Input;
 import Player.Player;
 import Player.PlayerType;
 
@@ -10,37 +10,38 @@ import java.util.ArrayList;
 public class CardGame {
 
     protected Integer noOfCards = 2;
-    protected ConsoleInput userInput;
-    protected Output userOutput;
     protected Deck deck;
+    public ArrayList<Player> players;
+    public Input userInput;
+    public ConsoleOutput userOutput;
+
 
     public void setNoOfCards(Integer noOfCards) {
         this.noOfCards = noOfCards;
     }
 
-    public CardGame(String deckOverride){
-        this.userInput = new ConsoleInput();
-        this.userOutput = new ConsoleOutput();
-        this.deck = new Deck(deckOverride);
+    public Deck getDeck() {
+        return deck;
     }
+
     public CardGame(){
+        this.deck = new Deck();
         this.userInput = new ConsoleInput();
         this.userOutput = new ConsoleOutput();
-        this.deck = new Deck();
+        this.players = new ArrayList<Player>();
     }
 
-    protected Player createHumanPlayer(){
-        String name = getHumanName();
-        return new Player(PlayerType.USER,name,0);
+    public void setUserInput(Input userInput){
+        this.userInput = userInput;
     }
 
-    protected String getHumanName() {
+    private void createHumanPlayer(){
         userOutput.output("What is your name");
-        String name = userInput.getInputString();
-        return name;
+        String name = userInput.getString();
+        players.add(new Player(PlayerType.USER,name,0));
     }
 
-    protected void createComputerPlayers(Integer noOfPlayers, ArrayList<Player> players) {
+    private void createComputerPlayers(Integer noOfPlayers) {
         Player dealer = new Player(PlayerType.DEALER,"Dealer 1",17);
         players.add(dealer);
         noOfPlayers -= 1; //Remove the dealer
@@ -49,19 +50,15 @@ public class CardGame {
         }
     }
 
-    protected ArrayList<Player> initiatePlayers(){
-        ArrayList<Player> players = new ArrayList<Player>();
-        players.add(createHumanPlayer());
-        createComputerPlayers(getNumberOfPlayers(), players);
-        return players;
-    }
-
-    protected int getNumberOfPlayers(){
+    public void initiatePlayers(){
+        players.clear();
+        createHumanPlayer();
         userOutput.output("How many players, minimum of two?");
-        return userInput.getInputInt();
+        int noOfPlayers = userInput.getInteger();
+        createComputerPlayers(noOfPlayers);
     }
 
-    protected void dealCards(Deck deck, ArrayList<Player> players){
+    protected void dealCards(){
         boolean allCards = false;
         int noOfCards;
         if (this.noOfCards == 0) {
@@ -72,7 +69,7 @@ public class CardGame {
         }
         for (Player player: players){
             Hand hand = new Hand();
-            hand = dealHand(hand,noOfCards, deck);
+            hand = dealHand(hand,noOfCards);
             player.setHand(hand);
         }
         if (allCards){
@@ -84,7 +81,7 @@ public class CardGame {
         }
     }
 
-    protected Hand dealHand(Hand hand, int noOfCards, Deck deck){
+    protected Hand dealHand(Hand hand, int noOfCards){
 
         for (int cardCounter=0;cardCounter<noOfCards;cardCounter++){
             if (deck.size() > 0) {
@@ -94,38 +91,12 @@ public class CardGame {
         return hand;
     }
 
-    protected void playerPlaysHand(Player player, Deck deck){
-        if (player.getPlayerType() == PlayerType.USER){
-            userPlays(player, deck);
-        } else {
-            computerPlays(player, deck);
-        }
+
+    public void initiate(){
+        initiatePlayers();
+        deck.shuffleDeck();
+        dealCards();
     }
-
-    protected void userPlays(Player player, Deck deck){
-
-    }
-
-    protected void computerPlays(Player player, Deck deck){
-
-    }
-
-    protected void play(){
-        ArrayList<Player> players = initiatePlayers();
-        setNoOfCards(noOfCards);
-        dealCards(deck, players);
-        Integer counterOfPlayers = 0;
-        while (!playerHasWon(players.get(counterOfPlayers))){
-            playerPlaysHand(players.get(counterOfPlayers), deck);
-            counterOfPlayers = (counterOfPlayers + 1) % players.size();
-        }
-        Player winningPlayer = determineWinner(players);
-        displayPlayer(winningPlayer, "Winner");
-        if (winningPlayer.getPlayerType() != PlayerType.USER) {
-            displayPlayer(players.get(0),"Your");
-        }
-    }
-
     protected Player determineWinner(ArrayList<Player> players){
         Integer winningScore = 0;
         Player winningPlayer = null;
@@ -140,22 +111,52 @@ public class CardGame {
         return winningPlayer;
     }
 
-    protected void displayPlayer(Player player, String info){
-        userOutput.output(info + " name is " + player.getName());
-        userOutput.output(info + " score is " + getScore(player.getHand()));
-        userOutput.output(info + " hand is " + player.getHand().toString());
+    public void play(){
+        initiate();
+        Integer counterOfPlayers = 0;
+        while (!players.get(counterOfPlayers).hasWon()){
+            playerPlaysHand(players.get(counterOfPlayers));
+            counterOfPlayers = (counterOfPlayers + 1) % players.size();
+        }
+        Player winner = determineWinner(players);
+        showPlayers();
+
     }
 
-    protected int getScore(Hand hand){
+    public int getScore(Hand hand){
         return 0;
     }
 
-    protected boolean playerHasWon(Player player){
-        return player.getWinner();
+    protected void userPlays(Player player, Deck deck){}
+
+    protected void computerPlays(Player player, Deck deck){}
+
+    protected void playerPlaysHand(Player player){
+        if (player.getPlayerType() == PlayerType.USER){
+            userPlays(player, deck);
+        } else {
+            computerPlays(player, deck);
+        }
+    }
+
+
+    public void showPlayers(){
+        String theWinner = "";
+        for (Player player: players){
+            if (player.hasWon()){
+                theWinner = "The winner is ";
+            } else {
+                theWinner = "";
+            }
+            userOutput.output(theWinner + player.getName() + " - " + player.getHand().toString());
+        }
     }
 
     public static void main(String[ ] args) {
         CardGame cardGame = new CardGame();
         cardGame.play();
+        cardGame.showPlayers();
+
+
     }
 }

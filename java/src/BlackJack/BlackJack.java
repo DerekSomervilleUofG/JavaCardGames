@@ -2,7 +2,6 @@ package BlackJack;
 import CardGame.Hand;
 import CardGame.Card;
 import Player.Player;
-import Player.PlayerType;
 import CardGame.CardGame;
 import CardGame.Deck;
 import java.util.ArrayList;
@@ -28,9 +27,9 @@ public class BlackJack extends CardGame {
         BlackJackActions userAction;
         help();
         if (player.hasHand()) {
-            userOutput.outputHand(player.getHand());
+            userOutput.output(player.getHand().toString());
         }
-        userChoice = userInput.getInputString();
+        userChoice = userInput.getString();
         userAction = BlackJackActions.getAction(userChoice.substring(0,1).toUpperCase());
         userOutput.output("You chose " + userAction.display());
         return userAction;
@@ -70,7 +69,7 @@ public class BlackJack extends CardGame {
     }
 
 
-    protected int getScore(Hand hand){
+    public int getScore(Hand hand){
         int score = 0;
         for (Card card: hand.getHandOfCards()){
             score += card.getRank().getValue();
